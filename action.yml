@@ -4,6 +4,12 @@ inputs:
   image-name:
     description: 'Image to build'
     required: true
+  repo-user:
+    description: 'Repository user'
+    required: false
+  repo-token:
+    description: 'Repository access token'
+    required: false
   working-dir:
     description: 'Working directory. Defaults to `image-name/`'
     required: false
@@ -24,28 +30,36 @@ runs:
           {{major}}.{{minor}}.{{patch}}
 
     - name: Download buildctl
+      shell: bash
       run: curl -sL https://github.com/moby/buildkit/releases/download/v0.9.0/buildkit-v0.9.0.linux-amd64.tar.gz | tar xvzf - -C /usr/local bin/buildctl
 
     - name: Login to Container Registry
-      if: github.event_name != 'pull_request'
-      uses: docker/login-action@v1
-      with:
-        registry: cr.nail.science
-        username: ${{ secrets.CR_USER }}
-        password: ${{ secrets.CR_TOKEN }}
+      shell: bash
+      env:
+        CR_TOKEN: ${{ inputs.repo-token }}
+      run: |
+        if ${{ toJSON(
+           github.event_name != 'push'
+         ) }}; then
+          echo "${CR_TOKEN}" | docker login --username "${{ inputs.CR_USER }}" --password-stdin
+        else
+          echo "Skip login"
+        fi
 
     - name: Set tag in Dockerfile
       working-directory: ${{ inputs.working-dir || inputs.image-name }}/
+      shell: bash
       run: sed -i "s/--TAG--/${{ steps.meta.version }}/g" Dockerfile
 
     - name: Build and push
       working-directory: ${{ inputs.working-dir || inputs.image-name }}/
+      shell: bash
       run: |
         buildctl --addr unix:///mnt/buildkit/buildkitd.sock \
           build \
           --frontend dockerfile.v0 \
           --local context=. \
           --local dockerfile=. \
-          --output type=image,\"name=${{ steps.meta.outputs.tags }}\",push=true \
+          --output type=image,\"name=${{ steps.meta.outputs.tags }}\",push=${{ github.event_name != 'pull_request' }} \
           --export-cache type=inline \
           --import-cache type=registry,ref=cr.nail.science/ml-containers/${{ inputs.image-name }}
