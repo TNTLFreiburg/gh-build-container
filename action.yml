@@ -35,13 +35,11 @@ runs:
 
     - name: Login to Container Registry
       shell: bash
-      env:
-        CR_TOKEN: ${{ inputs.repo-token }}
       run: |
         if ${{ toJSON(
            github.event_name != 'pull_request'
          ) }}; then
-          echo -n "${CR_TOKEN}" | docker login --username "${{ inputs.repo-user }}" --password-stdin cr.nail.science
+           docker login --username "${{ inputs.repo-user }}" --password "${{ inputs.repo-token }}" cr.nail.science
         else
           echo "Skip login"
         fi
