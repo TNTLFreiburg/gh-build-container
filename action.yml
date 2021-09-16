@@ -35,7 +35,9 @@ runs:
       shell: bash
       run: |
         export TARGET="${{ inputs.dockerfile || 'Dockerfile' }}"
-        [[ "${TARGET}" != 'Dockerfile' ]] && mv "${TARGET}" Dockerfile
+        if [[ "${TARGET}" != 'Dockerfile' ]]; then
+          mv "${TARGET}" Dockerfile
+        fi
 
     - name: Set tag in Dockerfile
       working-directory: ${{ inputs.working-dir || inputs.image-name }}/
