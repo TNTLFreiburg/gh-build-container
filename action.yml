@@ -41,7 +41,7 @@ runs:
         if ${{ toJSON(
            github.event_name != 'pull_request'
          ) }}; then
-          echo "${CR_TOKEN}" | docker login --username "${{ inputs.CR_USER }}" --password-stdin
+          echo "${CR_TOKEN}" | docker login --username "${{ inputs.repo-user }}" --password-stdin
         else
           echo "Skip login"
         fi
