@@ -39,10 +39,10 @@ runs:
       working-directory: ${{ inputs.working-dir || inputs.image-name }}/
       shell: bash
       run: |
+        mv ${{ inputs.dockerfile || 'Dockerfile' }} Dockerfile
         buildctl --addr unix:///mnt/buildkit/buildkitd.sock \
           build \
           --frontend dockerfile.v0 \
-          --frontend-opt filename=./${{ inputs.dockerfile || 'Dockerfile' }}
           --local context=. \
           --local dockerfile=. \
           --output type=image,\"name=${{ steps.meta.outputs.tags }}\",push=${{ github.event_name != 'pull_request' }} \
