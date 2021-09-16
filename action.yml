@@ -39,7 +39,7 @@ runs:
         CR_TOKEN: ${{ inputs.repo-token }}
       run: |
         if ${{ toJSON(
-           github.event_name != 'push'
+           github.event_name != 'pull_request'
          ) }}; then
           echo "${CR_TOKEN}" | docker login --username "${{ inputs.CR_USER }}" --password-stdin
         else
