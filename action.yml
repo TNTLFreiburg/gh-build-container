@@ -23,9 +23,9 @@ runs:
         images: cr.nail.science/ml-containers/${{ inputs.image-name }}
         sep-tags: ','
         tags: |
-          type=semver,pattern={{major}}
-          type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{major}}.{{minor}}.{{patch}}
+          type=semver,prefix=v,pattern={{major}}
+          type=semver,prefix=v,pattern={{major}}.{{minor}}
+          type=semver,prefix=v,pattern={{major}}.{{minor}}.{{patch}}
           type=ref,event=branch
           type=sha,prefix=git-,format=short
 
