@@ -18,13 +18,16 @@ runs:
 
     - name: Docker meta
       id: meta
-      uses: crazy-max/ghaction-docker-meta@v1
+      uses: crazy-max/ghaction-docker-meta@v3
       with:
         images: cr.nail.science/ml-containers/${{ inputs.image-name }}
-        tag-semver: |
-          {{major}}
-          {{major}}.{{minor}}
-          {{major}}.{{minor}}.{{patch}}
+        sep-tags: ','
+        tags: |
+          type=semver,pattern={{major}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=semver,pattern={{major}}.{{minor}}.{{patch}}
+          type=ref,event=branch
+          type=sha,prefix=git-,format=short
 
     - name: Download buildctl
       shell: bash
