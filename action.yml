@@ -39,7 +39,8 @@ runs:
       working-directory: ${{ inputs.working-dir || inputs.image-name }}/
       shell: bash
       run: |
-        mv ${{ inputs.dockerfile || 'Dockerfile' }} Dockerfile
+        export TARGET="${{ inputs.dockerfile || 'Dockerfile' }}"
+        [[ "${TARGET}" != 'Dockerfile' ]] && mv "${TARGET}" Dockerfile
         buildctl --addr unix:///mnt/buildkit/buildkitd.sock \
           build \
           --frontend dockerfile.v0 \
