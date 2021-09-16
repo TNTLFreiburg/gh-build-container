@@ -4,12 +4,6 @@ inputs:
   image-name:
     description: 'Image to build'
     required: true
-  repo-user:
-    description: 'Repository user'
-    required: false
-  repo-token:
-    description: 'Repository access token'
-    required: false
   working-dir:
     description: 'Working directory. Defaults to `image-name/`'
     required: false
@@ -32,17 +26,6 @@ runs:
     - name: Download buildctl
       shell: bash
       run: curl -sL https://github.com/moby/buildkit/releases/download/v0.9.0/buildkit-v0.9.0.linux-amd64.tar.gz | tar xvzf - -C /usr/local bin/buildctl
-
-    - name: Login to Container Registry
-      shell: bash
-      run: |
-        if ${{ toJSON(
-           github.event_name != 'pull_request'
-         ) }}; then
-           docker login --username "${{ inputs.repo-user }}" --password "${{ inputs.repo-token }}" cr.nail.science
-        else
-          echo "Skip login"
-        fi
 
     - name: Set tag in Dockerfile
       working-directory: ${{ inputs.working-dir || inputs.image-name }}/
