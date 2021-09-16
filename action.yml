@@ -30,7 +30,7 @@ runs:
     - name: Set tag in Dockerfile
       working-directory: ${{ inputs.working-dir || inputs.image-name }}/
       shell: bash
-      run: sed -i "s/--TAG--/${{ steps.meta.version }}/g" Dockerfile
+      run: sed -i "s/--TAG--/${{ steps.meta.outputs.version }}/g" Dockerfile
 
     - name: Build and push
       working-directory: ${{ inputs.working-dir || inputs.image-name }}/
@@ -43,4 +43,4 @@ runs:
           --local dockerfile=. \
           --output type=image,\"name=${{ steps.meta.outputs.tags }}\",push=${{ github.event_name != 'pull_request' }} \
           --export-cache type=inline \
-          --import-cache type=registry,ref=cr.nail.science/ml-containers/${{ inputs.image-name }}
+          --import-cache type=registry,ref=cr.nail.science/ml-containers/${{ inputs.image-name }}:${{ steps.meta.outputs.version }}
